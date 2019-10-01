@@ -38,11 +38,31 @@ spec:
       - name: dremio-master-coordinator
         image: {{.Values.image}}
         imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        lifecycle:
+          postStart:
+            exec:
+              command: 
+                - "sh"
+                - "-c"
+                - >
+                  mkdir /opt/dremio/data/pdfs; 
+                  gcsfuse -o nonempty --debug_fuse --key-file=/etc/service-accounts/service-account.json graphpath-dremio-stg /opt/dremio/data/pdfs; 
+                  chown dremio:dremio /opt/dremio/data/pdfs;                  
+          preStop:
+            exec:
+              command: ["fusermount", "-u", "/opt/dremio/data/pdfs"]
         resources:
           requests:
             memory: {{.Values.coordinator.memory}}M
             cpu: {{.Values.coordinator.cpu}}
         volumeMounts:
+        - name: service-account
+          mountPath: /etc/service-accounts
         - name: dremio-master-volume
           mountPath: /opt/dremio/data
         - name: dremio-config
@@ -64,6 +84,8 @@ spec:
             {{- if .Values.extraStartParams }}
             {{ .Values.extraStartParams }}
             {{- end }}
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/service-accounts/service-account.json
         command: ["/opt/dremio/bin/dremio"]
         args:
         - "start-fg"
@@ -160,6 +182,9 @@ spec:
       - name: dremio-config
         configMap:
           name: dremio-config
+      - name: service-account
+        secret:
+          secretName: service-account
       {{- if or .Values.tls.ui.enabled .Values.tls.client.enabled }}
       - name: dremio-tls
         emptyDir: {}
