@@ -30,16 +30,39 @@ spec:
       - name: dremio-executor
         image: {{.Values.image}}
         imagePullPolicy: IfNotPresent
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+              - SYS_ADMIN
+        lifecycle:
+          postStart:
+            exec:
+              command: 
+                - "sh"
+                - "-c"
+                - >
+                  mkdir /opt/dremio/data/pdfs; 
+                  gcsfuse -o nonempty --debug_fuse --key-file=/etc/service-accounts/service-account.json graphpath-dremio-stg-executor /opt/dremio/data/pdfs; 
+                  chown dremio:dremio /opt/dremio/data/pdfs;                  
+          preStop:
+            exec:
+              command: ["fusermount", "-u", "/opt/dremio/data/pdfs"]
+
         resources:
           requests:
             memory: {{.Values.executor.memory}}M
             cpu: {{.Values.executor.cpu}}
         volumeMounts:
+        - name: service-account
+          mountPath: /etc/service-accounts
         - name: dremio-executor-volume
           mountPath: /opt/dremio/data
         - name: dremio-config
           mountPath: /opt/dremio/conf
         env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/service-accounts/service-account.json
         - name: DREMIO_MAX_HEAP_MEMORY_SIZE_MB
           value: "{{ template "HeapMemory" .Values.executor.memory }}"
         - name: DREMIO_MAX_DIRECT_MEMORY_SIZE_MB
@@ -78,6 +101,9 @@ spec:
       - name: dremio-config
         configMap:
           name: dremio-config
+      - name: service-account
+        secret:
+          secretName: service-account
       {{- if .Values.imagePullSecrets }}
       imagePullSecrets:
         - name: {{ .Values.imagePullSecrets }}
