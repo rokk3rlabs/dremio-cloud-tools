@@ -43,7 +43,7 @@ spec:
                 - "-c"
                 - >
                   mkdir /opt/dremio/data/pdfs; 
-                  gcsfuse -o nonempty --debug_fuse --key-file=/etc/service-accounts/service-account.json graphpath-dremio-stg-executor /opt/dremio/data/pdfs; 
+                  gcsfuse -o nonempty --debug_fuse --key-file=/etc/service-accounts/service-account.json {{.Values.bucket_executor}} /opt/dremio/data/pdfs; 
                   chown dremio:dremio /opt/dremio/data/pdfs;                  
           preStop:
             exec:
