@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: dremio-odbc
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: dremio-odbc-{{.Values.namespace}}
+    
+spec:
+  tls:
+    - hosts:
+      - dremio-odbc-{{.Values.namespace}}.graphpath.ai
+      secretName: dremio-tls
+  rules:
+  - host: dremio-{{.Values.namespace}}.graphpath.ai
+    http:
+      paths:
+      - backend:
+          serviceName: dremio-client
+          servicePort: 9047
+
+  - host: dremio-odbc-{{.Values.namespace}}.graphpath.ai
+    http:
+      paths:
+      - backend:
+          serviceName: dremio-client
+          servicePort: 31010
