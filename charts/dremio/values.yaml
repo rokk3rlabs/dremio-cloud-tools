@@ -2,9 +2,9 @@
 # version tag to the version that you are using. This will ensure that all
 # the pods are using the same version of the software.
 image: us.gcr.io/rokk3r-ai/dremio:dev
-namespace: sandbox
-bucket_executor: graphpath-dremio-sandbox-executor
-bucket_master: graphpath-dremio-sandbox
+namespace: dev
+bucket_executor: dremio-dev-executor
+bucket_master: dremio-dev
 # bucket_executor: graphpath-dremio-prod-executor
 # bucket_master: graphpath-dremio-prod
 # Check out Dremio documentation for memory and cpu requirements for
