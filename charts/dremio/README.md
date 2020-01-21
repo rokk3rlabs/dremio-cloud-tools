@@ -17,6 +17,29 @@ An appropriate distributed file store (S3, ADLS, HDFS, etc) should be used for p
 
 This assumes you already have kubernetes cluster setup, kubectl configured to talk to your kubernetes cluster and helm setup in your cluster. Review and update values.yaml to reflect values for your environment before installing the helm chart. This is specially important for for the memory and cpu values - your kubernetes cluster should have sufficient resources to provision the pods with those values. If your kubernetes installation does not support serviceType LoadBalancer, it is recommended to comment the serviceType value in values.yaml file before deploying.
 
+#### Installing prerequisites
+
+Install Tiller
+
+```
+kubectl -n kube-system create serviceaccount tiller
+```
+
+Create clusterrolebinding
+
+```
+kubectl create clusterrolebinding tiller \
+  --clusterrole=cluster-admin \
+  --serviceaccount=kube-system:tiller
+```
+
+Initialize Helm
+
+```
+helm init --service-account tiller
+```
+
+
 #### Installing the helm chart
 Review charts/dremio/values.yaml and adjust the values as per your requirements. Note that the values for cpu and memory for the coordinator and the executors are set to work with AKS on Azure with worker nodes setup with machine types Standard_E16s_v3.
 

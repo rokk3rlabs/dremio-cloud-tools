@@ -37,11 +37,16 @@ spec:
         volumeMounts:
         - name: dremio-config
           mountPath: /opt/dremio/conf
+        - name: service-account
+          secret:
+            secretName: service-account
         {{- if or .Values.tls.ui.enabled .Values.tls.client.enabled }}
         - name: dremio-tls
           mountPath: /opt/dremio/tls
         {{- end }}
         env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /etc/service-accounts/service-account.json
         - name: DREMIO_MAX_HEAP_MEMORY_SIZE_MB
           value: "{{ template "HeapMemory" .Values.coordinator.memory }}"
         - name: DREMIO_MAX_DIRECT_MEMORY_SIZE_MB

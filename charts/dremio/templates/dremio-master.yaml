@@ -96,12 +96,18 @@ spec:
           name: client
         - containerPort: 45678
           name: server
+        # readinessProbe:
+        #   httpGet:
+        #     path: /
+        #     {{- if .Values.tls.ui.enabled }}
+        #     scheme: HTTPS
+        #     {{- end }}
+        #     port: 9047
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 5
+          
         readinessProbe:
-          httpGet:
-            path: /
-            {{- if .Values.tls.ui.enabled }}
-            scheme: HTTPS
-            {{- end }}
+          tcpSocket:
             port: 9047
           initialDelaySeconds: 5
           periodSeconds: 5
