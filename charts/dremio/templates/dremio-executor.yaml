@@ -42,12 +42,20 @@ spec:
                 - "sh"
                 - "-c"
                 - >
-                  mkdir /opt/dremio/data/pdfs; 
+                  mkdir /opt/dremio/data/pdfs;
+                  mkdir /opt/dremio/data/bigfiles;
                   gcsfuse -o nonempty --debug_fuse --key-file=/etc/service-accounts/service-account.json {{.Values.bucket_executor}} /opt/dremio/data/pdfs; 
-                  chown dremio:dremio /opt/dremio/data/pdfs;                  
+                  gcsfuse -o nonempty --debug_fuse --key-file=/etc/service-accounts/service-account.json {{.Values.bucket_bigfiles}} /opt/dremio/data/bigfiles; 
+                  chown dremio:dremio /opt/dremio/data/pdfs;
+                  chown dremio:dremio /opt/dremio/data/bigfiles;
           preStop:
             exec:
-              command: ["fusermount", "-u", "/opt/dremio/data/pdfs"]
+              command:
+                - "sh"
+                - "-c"
+                - >
+                  fusermount -u /opt/dremio/data/pdfs
+                  fusermount -u /opt/dremio/data/bigfiles
 
         resources:
           requests:
