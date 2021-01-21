@@ -1,18 +1,18 @@
 # The image used to build the Dremio cluster. It is recommended to update the
 # version tag to the version that you are using. This will ensure that all
 # the pods are using the same version of the software.
-image: us.gcr.io/rokk3r-ai/dremio:dev
-namespace: dev
-bucket_executor: dremio-dev-executor
-bucket_master: dremio-dev
+image: us.gcr.io/rokk3r-ai/dremio:prod
+namespace: prod
+bucket_executor: dremio-prod-executor
+bucket_master: dremio-prod
 # bucket_executor: graphpath-dremio-prod-executor
 # bucket_master: graphpath-dremio-prod
 # Check out Dremio documentation for memory and cpu requirements for
 # the coordinators and the executors.
 # The value of memory should be in MB. CPU is in no of cores.
 coordinator:
-  memory: 1024
-  cpu: 0.3
+  memory: 2048
+  cpu: 0.4
   # This count is for slave coordinators only.
   # The chart will always create one master coordinator - you are
   # not required to have more than one master coordinator.
@@ -26,12 +26,12 @@ coordinator:
 executor:
   memory: 1024
   cpu: 0.3
-  count: 3
+  count: 1
   volumeSize: 100Gi
 zookeeper:
   memory: 1024
   cpu: 0.5
-  count: 3
+  count: 2
   volumeSize: 10Gi
 
 # To create a TLS secret, use the following command:
